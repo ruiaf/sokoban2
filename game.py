@@ -6,7 +6,7 @@ from random_player import RandomPlayer
 from human_player import HumanPlayer
 
 parser = argparse.ArgumentParser(description="Run the game")
-parser.add_argument("--map", help="Filepath to the map", default="./maps/simple.txt")
+parser.add_argument("--map", help="Filepath to the map", default="./maps/simple_two_player.txt")
 parser.add_argument("--player", help="Player type", choices=["human", "random"], default="human")
 parser.add_argument("--n_turns", help="Maximum number of turns before halt", type=int, default=100)
 parser.add_argument("--n_games", help="Number of games to run in total", type=int, default=1)
@@ -44,7 +44,6 @@ class SokobanManager:
 
 
 if __name__ == '__main__':
-
     i = 0
     while i < args.n_games:
         b, e = i, min(i + args.n_parallel, args.n_games)
