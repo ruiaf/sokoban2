@@ -2,8 +2,7 @@ import argparse
 import logging
 
 from map import Map
-from random_player import RandomPlayer
-from human_player import HumanPlayer
+from players import RandomPlayer, HumanPlayer
 
 parser = argparse.ArgumentParser(description="Run the game")
 parser.add_argument("--map", help="Filepath to the map", default="./maps/classic.txt")
@@ -15,6 +14,7 @@ parser.add_argument("--log_level", help="Log level", default=logging.ERROR)
 args = parser.parse_args()
 
 logging.getLogger().setLevel(args.log_level)
+
 
 class SokobanManager:
     def __init__(self, game_number):
@@ -35,7 +35,6 @@ class SokobanManager:
     def start(self):
         for turn_number in range(args.n_turns):
             logging.debug("Turn %d in game %d" % (turn_number, self.game_number))
-            print(self.map)
             for player_name, player in self.player.items():
                 player.set_state(self.map)
                 action = player.get_action()

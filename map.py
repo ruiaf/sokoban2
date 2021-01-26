@@ -21,6 +21,7 @@ class Action(object):
     WEST = Position(0, -1)
     SKIP = Position(0, 0)
 
+    @staticmethod
     def from_key(key: str):
         print("'%s'" % key)
         if len(key) < 1:

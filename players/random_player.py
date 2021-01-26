@@ -9,7 +9,7 @@ class RandomPlayer(object):
         self.possible_actions = [Action.NORTH, Action.SOUTH, Action.WEST, Action.EAST]
 
     def set_state(self, state):
-        pass
+        print(state)
 
     def get_action(self) -> Action:
         return random.choice(self.possible_actions)
