@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class Piece(object):
     def __init__(self, piece: str):
         if piece not in ["#", "X", "O", " ", "P", "@"] and not piece.isdigit():

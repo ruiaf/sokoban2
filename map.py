@@ -66,6 +66,7 @@ class Map(object):
 
             if c.isdigit():
                 self.players[c] = Position(len(self.map), len(row))
+                c = " "
 
             row.append(Piece(c))
 
@@ -75,9 +76,16 @@ class Map(object):
 
     def __str__(self) -> str:
         result = []
-        for row in self.map:
-            for p in row:
-                result.append(str(p))
+        for i in range(len(self.map)):
+            for j in range(len(self.map[i])):
+                is_player = False
+                for player_name, pos in self.players.items():
+                    if pos.pos == (i, j):
+                        result.append(player_name)
+                        is_player = True
+                        break
+                if not is_player:
+                    result.append(str(self.map[i][j]))
             result.append("\n")
         return "".join(result)
 
@@ -85,17 +93,14 @@ class Map(object):
         cur_pos = self.players[player_name]
         next_pos = cur_pos.next(action)
 
-        if self[next_pos] == Pieces.EMPTY:
-            self[next_pos] = self[cur_pos]
-            self[cur_pos] = Pieces.EMPTY
+        if self[next_pos] in [Pieces.EMPTY, Pieces.TARGET]:
             self.players[player_name] = next_pos
             return ActionResult()  # player moved
-        elif self[next_pos] == Pieces.BOX:
+        elif self[next_pos] in [Pieces.BOX, Pieces.BOX_AT_TARGET]:
             next_box_pos = next_pos.next(action)
             if self[next_box_pos] in [Pieces.EMPTY, Pieces.TARGET]:
                 self[next_box_pos] = Pieces.BOX if self[next_box_pos] == Pieces.EMPTY else Pieces.BOX_AT_TARGET
-                self[next_pos] = self[cur_pos]
-                self[cur_pos] = Pieces.EMPTY
+                self[next_pos] = Pieces.EMPTY if self[next_pos] == Pieces.BOX else Pieces.TARGET
                 self.players[player_name] = next_pos
                 return ActionResult()  # player moved box
 
