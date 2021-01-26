@@ -43,7 +43,7 @@ class SokobanManager:
                 player.set_action_result(action_result)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  
     i = 0
     while i < args.n_games:
         b, e = i, min(i + args.n_parallel, args.n_games)
