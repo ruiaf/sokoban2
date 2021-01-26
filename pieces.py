@@ -1,6 +1,6 @@
 class Piece(object):
     def __init__(self, piece: str):
-        if piece not in ["#", "X", "O", " ", "P", "@"] and not piece.isdigit():
+        if piece not in ["#", "X", "O", " ", "@"] and not piece.isdigit():
             raise Exception("Invalid Piece \"%s\"" % piece)
         self.value: str = piece
 
@@ -20,5 +20,4 @@ class Pieces(object):
     BOX = Piece("X")
     TARGET = Piece("O")
     EMPTY = Piece(" ")
-    PLAYER = Piece("P")
     BOX_AT_TARGET = Piece("@")
