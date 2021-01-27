@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import List, Dict
 
 from pieces import Piece, Pieces
@@ -39,7 +38,13 @@ class Action(object):
 
 class ActionResult(object):
     def __init__(self):
-        pass
+        self.player_moved = False
+        self.box_moved = False
+        self.box_moved_to_target = False
+        self.box_moved_away_from_target = False
+        self.box_is_stuck = False
+        self.all_boxes_in_target = False
+        self.max_turns_reached = False
 
 
 class Map(object):
@@ -47,7 +52,8 @@ class Map(object):
         self.map: List[List[Piece]] = list()
         self.width: int = None
         self.players: Dict[str, Position] = dict()
-        self.max_num_turns = max_num_turns
+        self.open_boxes = 0
+        self.num_turns_left = max_num_turns
 
     def load_from_string(self, map_txt: str):
         map_txt += "\n"
@@ -69,7 +75,13 @@ class Map(object):
                 self.players[c] = Position(len(self.map), len(row))
                 c = " "
 
-            row.append(Piece(c))
+            piece = Piece(c)
+            if piece == Pieces.BOX:
+                self.open_boxes += 1
+
+            row.append(piece)
+
+        self.num_turns_left *= len(self.players)
 
     def load_from_file(self, map_path):
         with open(map_path, "r") as map_file:
@@ -91,21 +103,47 @@ class Map(object):
         return "".join(result)
 
     def apply_action(self, player_name, action) -> ActionResult:
+        self.num_turns_left -= 1
         cur_pos = self.players[player_name]
         next_pos = cur_pos.next(action)
+        result = ActionResult()
 
         if self[next_pos] in [Pieces.EMPTY, Pieces.TARGET]:
             self.players[player_name] = next_pos
-            return ActionResult()  # player moved
+            result.player_moved = True
         elif self[next_pos] in [Pieces.BOX, Pieces.BOX_AT_TARGET]:
             next_box_pos = next_pos.next(action)
             if self[next_box_pos] in [Pieces.EMPTY, Pieces.TARGET]:
-                self[next_box_pos] = Pieces.BOX if self[next_box_pos] == Pieces.EMPTY else Pieces.BOX_AT_TARGET
-                self[next_pos] = Pieces.EMPTY if self[next_pos] == Pieces.BOX else Pieces.TARGET
-                self.players[player_name] = next_pos
-                return ActionResult()  # player moved box
+                result.player_moved = True
+                result.box_moved = True
+                result.box_moved_away_from_target = (self[next_pos] == Pieces.BOX_AT_TARGET)
+                result.box_moved_to_target = (self[next_box_pos] == Pieces.TARGET)
 
-        return ActionResult()  # player tried to move but it can't move
+                if result.box_moved_away_from_target:
+                    self[next_pos] = Pieces.TARGET
+                    self.open_boxes += 1
+                else:
+                    self[next_pos] = Pieces.EMPTY
+
+                if result.box_moved_to_target:
+                    self[next_box_pos] = Pieces.BOX_AT_TARGET
+                    self.open_boxes -= 1
+                else:
+                    self[next_box_pos] = Pieces.BOX
+
+                self.players[player_name] = next_pos
+
+                if self.open_boxes == 0:
+                    result.all_boxes_in_target = True
+
+                # TODO: Detect stuck boxes early
+                if not result.box_moved_to_target and False:
+                    result.box_is_stuck = True
+
+        if self.num_turns_left <= 0:
+            result.max_turns_reached = True
+
+        return result  # player tried to move but it can't move
 
     def __getitem__(self, position: Position) -> Piece:
         if position.pos[0] < 0 or \

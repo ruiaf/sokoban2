@@ -10,7 +10,7 @@ parser.add_argument("--player", help="Player type", choices=["human", "random"],
 parser.add_argument("--n_turns", help="Maximum number of turns before halt", type=int, default=100)
 parser.add_argument("--n_games", help="Number of games to run in total", type=int, default=1)
 parser.add_argument("--n_parallel", help="Number of games to run in parallel", type=int, default=1)
-parser.add_argument("--log_level", help="Log level", default=logging.ERROR)
+parser.add_argument("--log_level", help="Log level", default=logging.DEBUG)
 args = parser.parse_args()
 
 logging.getLogger().setLevel(args.log_level)
@@ -26,20 +26,29 @@ class SokobanManager:
 
         self.player: dict(str, RandomPlayer) = dict()
         for player_name in self.map.players.keys():
-            logging.info("Initializing player %s for game %s" % (player_name, game_number))
+            logging.info("Initializing player %s for game %s as %s" % (player_name, game_number, args.player))
             if args.player == "random":
                 self.player[player_name] = RandomPlayer(player_name)
             elif args.player == "human":
                 self.player[player_name] = HumanPlayer(player_name)
 
     def start(self):
-        for turn_number in range(args.n_turns):
+        for turn_number in range(1, args.n_turns + 1):
             logging.debug("Turn %d in game %d" % (turn_number, self.game_number))
             for player_name, player in self.player.items():
                 player.set_state(self.map)
                 action = player.get_action()
                 action_result = self.map.apply_action(player_name, action)
                 player.set_action_result(action_result)
+
+            if action_result.all_boxes_in_target:
+                logging.debug("Game %d was won in turn %d" % (self.game_number, turn_number))
+                break
+
+        if action_result.max_turns_reached:
+            logging.debug("Game %d was lost at turn %d" % (self.game_number, turn_number))
+
+        logging.debug("Game %d final position at turn %d was:\n %s" % (self.game_number, turn_number, self.map))
 
 
 if __name__ == '__main__':
