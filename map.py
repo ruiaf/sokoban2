@@ -20,21 +20,6 @@ class Action(object):
     WEST = Position(0, -1)
     SKIP = Position(0, 0)
 
-    @staticmethod
-    def from_key(key: str):
-        print("'%s'" % key)
-        if len(key) < 1:
-            return None
-        if key[0] == "w":
-            return Action.NORTH
-        if key[0] == "a":
-            return Action.WEST
-        if key[0] == "s":
-            return Action.SOUTH
-        if key[0] == "d":
-            return Action.EAST
-        return None
-
 
 class ActionResult(object):
     def __init__(self):
@@ -104,9 +89,13 @@ class Map(object):
 
     def apply_action(self, player_name, action) -> ActionResult:
         self.num_turns_left -= 1
+        result = ActionResult()
+
+        if action == Action.SKIP:
+            return result
+
         cur_pos = self.players[player_name]
         next_pos = cur_pos.next(action)
-        result = ActionResult()
 
         if self[next_pos] in [Pieces.EMPTY, Pieces.TARGET]:
             self.players[player_name] = next_pos
