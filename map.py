@@ -12,13 +12,26 @@ class Position(object):
             self.pos[0] + action.pos[0],
             self.pos[1] + action.pos[1])
 
+    def __hash__(self):
+        return hash(self.pos)
 
-class Action(object):
-    NORTH = Position(-1, 0)
-    SOUTH = Position(1, 0)
-    EAST = Position(0, 1)
-    WEST = Position(0, -1)
-    SKIP = Position(0, 0)
+    def __eq__(self, other):
+        return self.pos == other.pos
+
+
+class Action(Position):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+
+
+class Actions:
+    NORTH = Action(-1, 0)
+    SOUTH = Action(1, 0)
+    EAST = Action(0, 1)
+    WEST = Action(0, -1)
+    SKIP = Action(0, 0)
+
+    ALL: List[Action] = [NORTH, SOUTH, EAST, WEST, SKIP]
 
 
 class ActionResult(object):
@@ -91,7 +104,7 @@ class Map(object):
         self.num_turns_left -= 1
         result = ActionResult()
 
-        if action == Action.SKIP:
+        if action == Actions.SKIP:
             return result
 
         cur_pos = self.players[player_name]
