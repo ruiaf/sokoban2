@@ -1,12 +1,13 @@
 import random
 from typing import Tuple, Dict
+import math
 
 from args import Args
 from map import Action, ActionResult, Map, Actions
 
 Args.instance().parser.add_argument("--learning_rate", help="Learning rate", type=float, default=0.1)
 Args.instance().parser.add_argument("--discount_factor", help="Discount factor", type=float, default=0.9)
-Args.instance().parser.add_argument("--epsilon", help="Epsilon-greedy exploration prob", type=float, default=0.05)
+Args.instance().parser.add_argument("--epsilon", help="Epsilon-greedy exploration prob", type=float, default=0.1)
 
 
 class StateKey:
@@ -24,7 +25,7 @@ class QlearnPlayer(object):
     q_map: Dict[Tuple[StateKey, Action], float] = dict()
 
     def __init__(self, name):
-        self.turn = 0
+        self.turn = 1
         self.name = name
         self.last_state_key = None
         self.last_action = None
@@ -74,14 +75,14 @@ class QlearnPlayer(object):
     def reward(self, action_result: ActionResult):
         r = 0.0
 
-        if not action_result.player_moved:
-            r -= 0.0001
+        if action_result.player_moved:
+            r += 0.0001
 
-        if not action_result.box_moved:
-            r -= 0.001
+        if action_result.box_moved:
+            r += 0.001
 
-        if not action_result.box_moved_to_target:
-            r -= 0.01
+        if action_result.box_moved_to_target:
+            r += 0.01
 
         if action_result.box_moved_away_from_target:
             r -= 0.01
@@ -92,4 +93,4 @@ class QlearnPlayer(object):
         if action_result.all_boxes_in_target:
             r += 1.0
 
-        return r
+        return r / math.log(self.turn + 1)

@@ -8,7 +8,7 @@ from players import RandomPlayer, HumanPlayer, QlearnPlayer
 Args.instance().parser.add_argument("--map", help="Filepath to the map", default="./maps/simple.txt")
 Args.instance().parser.add_argument("--player", help="Player", choices=["human", "random", "qlearn"], default="qlearn")
 Args.instance().parser.add_argument("--n_turns", help="Maximum number of turns before halt", type=int, default=100)
-Args.instance().parser.add_argument("--n_games", help="Number of games to run in total", type=int, default=8000)
+Args.instance().parser.add_argument("--n_games", help="Number of games to run in total", type=int, default=80000)
 Args.instance().parser.add_argument("--n_parallel", help="Number of games to run in parallel", type=int, default=8)
 Args.instance().parser.add_argument("--log_level", help="Log level", default=logging.DEBUG)
 
