@@ -46,8 +46,7 @@ class SokobanManager:
                 player.set_action_result(action_result)
 
             if action_result.all_boxes_in_target:
-                logging.info("Game %d was won in turn %d", self.game_number, turn_number)
-                print("yes")
+                logging.info("YES! Game %d was won in turn %d", self.game_number, turn_number)
                 break
 
         if action_result.max_turns_reached:
