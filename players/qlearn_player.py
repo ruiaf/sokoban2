@@ -88,9 +88,9 @@ class QlearnPlayer(object):
             r -= 0.01
 
         if action_result.box_is_stuck and not action_result.box_moved_to_target:
-            r -= 1.0
+            r -= 1000.0
 
         if action_result.all_boxes_in_target:
-            r += 1.0
+            r += 1000.0
 
         return r / math.log(self.turn + 1)
